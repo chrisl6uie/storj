@@ -97,6 +97,18 @@ func NewStreamStore(segments segments.Store, segmentSize int64, rootKey string, 
 func (s *streamStore) Put(ctx context.Context, path paths.Path, data io.Reader, metadata []byte, expiration time.Time) (m Meta, err error) {
 	defer mon.Task()(&ctx)(&err)
 
+	// check if last l/xxx/xx exists?
+	_, err = s.segments.Meta(ctx, path.Prepend("l"))
+
+	// previously file uploaded
+	if err == nil {
+		err = s.Delete(ctx, path)
+		if err != nil {
+			zap.S().Errorf("failed overwriting: %+v", err)
+			return Meta{}, err
+		}
+	}
+
 	var currentSegment int64
 	var streamSize int64
 	var putMeta segments.Meta

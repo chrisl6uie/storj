@@ -5,6 +5,7 @@ package streams
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -136,6 +137,7 @@ func TestStreamStorePut(t *testing.T) {
 				}
 			})
 
+		mockSegmentStore.EXPECT().Meta(gomock.Any(), paths.New(test.path).Prepend("l")).Return(segmentMeta, errors.New("non-nil"))
 		streamStore, err := NewStreamStore(mockSegmentStore, 10, "key", 10, 0)
 		if err != nil {
 			t.Fatal(err)
