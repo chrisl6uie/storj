@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"context"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -27,6 +28,13 @@ var cfg Config
 var RootCmd = &cobra.Command{
 	Use:   "uplink",
 	Short: "The Storj client-side S3 gateway and CLI",
+}
+
+func init() {
+	exe, err := os.Executable()
+	if err == nil {
+		RootCmd.Use = exe
+	}
 }
 
 func addCmd(cmd *cobra.Command) *cobra.Command {

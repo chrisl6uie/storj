@@ -30,8 +30,24 @@ var (
 	defaultConfDir = "$HOME/.storj/capt"
 )
 
+func init() {
+	exe, err := os.Executable()
+	if err == nil {
+		rootCmd.Use = exe
+	}
+}
+
 func main() {
 	go dumpHandler()
+	// Figure out the executable name.
+	exe, err := os.Executable()
+	if err != nil {
+		exe = "captplanet.exe"
+	}
+	// Make the windows graphical launch text a bit more friendly.
+	cobra.MousetrapHelpText = fmt.Sprintf("This is a command line tool.\n\n"+
+		"This needs to be run from a Command Prompt.\n"+
+		"Try running \"%s help\" for more information", exe)
 
 	// process.Exec will load this for this command.
 	runCmd.Flags().String("config",

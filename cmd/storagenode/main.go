@@ -4,6 +4,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -51,6 +52,11 @@ func init() {
 	rootCmd.AddCommand(setupCmd)
 	cfgstruct.Bind(runCmd.Flags(), &runCfg, cfgstruct.ConfDir(defaultConfDir))
 	cfgstruct.Bind(setupCmd.Flags(), &setupCfg, cfgstruct.ConfDir(defaultConfDir))
+
+	exe, err := os.Executable()
+	if err == nil {
+		rootCmd.Use = exe
+	}
 }
 
 func cmdRun(cmd *cobra.Command, args []string) (err error) {
@@ -89,6 +95,15 @@ func cmdSetup(cmd *cobra.Command, args []string) (err error) {
 }
 
 func main() {
+	// Figure out the executable name.
+	exe, err := os.Executable()
+	if err != nil {
+		exe = "storagenode.exe"
+	}
+	// Make the windows graphical launch text a bit more friendly.
+	cobra.MousetrapHelpText = fmt.Sprintf("This is a command line tool.\n\n"+
+		"This needs to be run from a Command Prompt.\n"+
+		"Try running \"%s help\" for more information", exe)
 	runCmd.Flags().String("config",
 		filepath.Join(defaultConfDir, "config.yaml"), "path to configuration")
 	process.Exec(rootCmd)
