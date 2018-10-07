@@ -7,15 +7,10 @@ import (
 	"context"
 	"fmt"
 	"sync"
-
-	"gopkg.in/spacemonkeygo/monkit.v2"
-
+	
+	"storj.io/storj/pkg/datarepair"
 	q "storj.io/storj/pkg/datarepair/queue"
 	"storj.io/storj/pkg/pb"
-)
-
-var (
-	mon = monkit.Package()
 )
 
 // Repairer is the interface for the data repair queue
@@ -102,7 +97,7 @@ func (r *repairer) Run() (err error) {
 
 // Repair starts repair of the segment
 func (r *repairer) Repair(seg *pb.InjuredSegment) (err error) {
-	defer mon.Task()(&r.ctx)(&err)
+	defer datarepair.Mon.Task()(&r.ctx)(&err)
 	r.inProgress++
 	fmt.Println(seg)
 
